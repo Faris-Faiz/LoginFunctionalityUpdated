@@ -2,21 +2,46 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package updatedloginfunctionality;
+package forms;
 
+import database.ConnectDatabase;
 import java.sql.*;
 import javax.swing.JOptionPane;
+import student.StudentCourses;
+import registers.StudentRegister;
 
 /**
  *
  * @author Faris Faiz
  */
-public class LoginForm1 extends javax.swing.JFrame {
+public class LoginForm extends javax.swing.JFrame {
     
     Connection con = ConnectDatabase.connectdb();
     PreparedStatement ps = null;
     ResultSet rs = null;
+    PreparedStatement ps1 = null;
+    ResultSet rs1 = null;
     static String userName = "PLACEHOLDER";
+    static int student_type;
+    static String matrixNumber;
+    static int muet_band;
+    static int csit;
+
+    public static int getCsit() {
+        return csit;
+    }
+
+    public static void setCsit(int csit) {
+        LoginForm.csit = csit;
+    }
+
+    public static int getMuet_band() {
+        return muet_band;
+    }
+
+    public static void setMuet_band(int muet_band) {
+        LoginForm.muet_band = muet_band;
+    }
     
     public void setUserName(String inputtedUserName){
         this.userName = inputtedUserName;
@@ -26,10 +51,26 @@ public class LoginForm1 extends javax.swing.JFrame {
         return userName;
     }
 
+    public static int getStudent_type() {
+        return student_type;
+    }
+
+    public static void setStudent_type(int student_type) {
+        LoginForm.student_type = student_type;
+    }
+
+    public static String getMatrixNumber() {
+        return matrixNumber;
+    }
+
+    public static void setMatrixNumber(String matrixNumber) {
+        LoginForm.matrixNumber = matrixNumber;
+    }
+    
     /**
      * Creates new form LoginForm1
      */
-    public LoginForm1() {
+    public LoginForm() {
         initComponents();
         ConnectDatabase.connectdb();
     }
@@ -48,8 +89,8 @@ public class LoginForm1 extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         usernameTextField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        loginButton = new javax.swing.JButton();
+        registerButton = new javax.swing.JButton();
         passwordTextField = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -69,17 +110,17 @@ public class LoginForm1 extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Login");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        loginButton.setText("Login");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                loginButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Cancel");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        registerButton.setText("Register");
+        registerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                registerButtonActionPerformed(evt);
             }
         });
 
@@ -99,12 +140,11 @@ public class LoginForm1 extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(usernameTextField)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(33, 33, 33)
-                                .addComponent(jButton1)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(registerButton)
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton2))
+                                .addComponent(loginButton))
+                            .addComponent(usernameTextField)
                             .addComponent(passwordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))))
                 .addContainerGap(43, Short.MAX_VALUE))
         );
@@ -121,11 +161,11 @@ public class LoginForm1 extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(27, 27, 27)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addContainerGap(176, Short.MAX_VALUE))
+                    .addComponent(registerButton)
+                    .addComponent(loginButton))
+                .addContainerGap(185, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -146,11 +186,13 @@ public class LoginForm1 extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_usernameTextFieldActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
+        StudentRegister registerStudent = new StudentRegister();
+        registerStudent.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_registerButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         String login = "SELECT * FROM logintable WHERE MATRIX_NUMBER = ? AND password = ?";
         try {
             ps = con.prepareStatement(login);
@@ -160,23 +202,41 @@ public class LoginForm1 extends javax.swing.JFrame {
             if(rs.next()){
                 
                 String inputtedUserName = usernameTextField.getText();
-                String fullName = "SELECT FULLNAME FROM logintable WHERE MATRIX_NUMBER = '" + inputtedUserName + "'";
-                ps = con.prepareStatement(fullName);
-                rs = ps.executeQuery();
-                while(rs.next()){
-                    String username = rs.getString("FULLNAME");
+                setMatrixNumber(inputtedUserName);
+                String fullName = "SELECT * FROM logintable WHERE MATRIX_NUMBER = '" + inputtedUserName + "'";
+                ps1 = con.prepareStatement(fullName);
+                rs1 = ps1.executeQuery();
+                while(rs1.next()){
+                    student_type = rs1.getInt("STDNT_TYPE");
+                    setStudent_type(student_type);
+                    String username = rs1.getString("FULLNAME");
                     setUserName(username);
+                    muet_band = rs1.getInt("MUET_BAND");
+                    setMuet_band(muet_band);
+                    csit = rs1.getInt("CSIT_LOGIN");
+                    setCsit(csit);
+                    
                     JOptionPane.showMessageDialog(null, "Welcome " + username + "!");
+                    if(student_type == -1){
+                        dispose();
+                        new admin.AdminPanel().setVisible(true);
+                    }
+                    if(student_type == 0){
+                        dispose();
+                        new lecturer.LecturerPanel().setVisible(true);
+                    }
+                    if(student_type>0){
+                        dispose();
+                        new student.StudentPanel().setVisible(true);
+                    }
                 }
-                dispose();
-                new WelcomePage().setVisible(true);
             }else{
                 JOptionPane.showMessageDialog(null, "Login Failed");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_loginButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -195,32 +255,33 @@ public class LoginForm1 extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoginForm1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoginForm1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoginForm1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoginForm1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginForm1().setVisible(true);
+                new LoginForm().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordTextField;
+    private javax.swing.JButton registerButton;
     private javax.swing.JTextField usernameTextField;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package updatedloginfunctionality;
+package Main;
 
+import forms.LoginForm;
 import javax.swing.*;
 import java.sql.*;
 
@@ -14,6 +15,6 @@ import java.sql.*;
 public class Main {
 
     public static void main(String[] args) {
-        new LoginForm1().setVisible(true);
+        new LoginForm().setVisible(true);
     }
 }

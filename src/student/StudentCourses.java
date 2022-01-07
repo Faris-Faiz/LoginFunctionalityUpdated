@@ -2,32 +2,35 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package updatedloginfunctionality;
+package student;
 
+import forms.ModuleDetails;
+import forms.LoginForm;
+import database.ConnectDatabase;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
  *
  * @author Faris Faiz
  */
-public class WelcomePage extends javax.swing.JFrame {
+public class StudentCourses extends javax.swing.JFrame {
 
     Connection con = ConnectDatabase.connectdb();
     PreparedStatement ps = null;
     ResultSet rs = null;
-    LoginForm1 lf = new LoginForm1();
+    LoginForm lf = new LoginForm();
     static String moduleCode = "PLACEHOLDER!";
+    static String credit, activity;
     DefaultTableModel tblModel;
 
     /**
      * Creates new form WelcomePage
      */
-    public WelcomePage() {
+    public StudentCourses() {
         ConnectDatabase.connectdb();
         initComponents();
         tblModel = (DefaultTableModel) jTable1.getModel();
@@ -43,12 +46,29 @@ public class WelcomePage extends javax.swing.JFrame {
         return moduleCode;
     }
 
+    public static String getCredit() {
+        return credit;
+    }
+
+    public static void setCredit(String credit) {
+        StudentCourses.credit = credit;
+    }
+
+    public static String getActivity() {
+        return activity;
+    }
+
+    public static void setActivity(String activity) {
+        StudentCourses.activity = activity;
+    }
+
     public void setUsername() {
         jLabel1.setText("Welcome " + lf.getUserName() + "!");
     }
 
-    public void retrieveData() {
-        String q1 = "SELECT * FROM VALID_MODULES";
+    private void retrieveData() {
+        LoginForm lf = new LoginForm();
+        String q1 = "SELECT * FROM VALID_MODULES WHERE STUDENTTYPE = " + lf.getStudent_type() + " OR STUDENTTYPE = 0 AND MUET = 0 AND CSIT = 0 OR MUET = " + lf.getMuet_band() + "OR CSIT = " + lf.getCsit();
         try {
             ps = con.prepareStatement(q1);
             rs = ps.executeQuery();
@@ -56,9 +76,11 @@ public class WelcomePage extends javax.swing.JFrame {
                 String MODULES = rs.getString("MODULE");
                 String CREDIT = rs.getString("CREDIT");
                 String ACTIVITY = rs.getString("ACTIVITY");
+                String STUDENTTYPE = rs.getString("STUDENTTYPE");
+                String CSIT = rs.getString("CSIT");
+                String MUET = rs.getString("MUET");
 
                 String tbData[] = {MODULES, CREDIT, ACTIVITY};
-                //DefaultTableModel tblModel = (DefaultTableModel) jTable1.getModel();
 
                 tblModel.addRow(tbData);
             }
@@ -81,6 +103,8 @@ public class WelcomePage extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         resetButton = new javax.swing.JButton();
+        backButton = new javax.swing.JButton();
+        viewButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -127,14 +151,24 @@ public class WelcomePage extends javax.swing.JFrame {
             }
         });
 
+        backButton.setText("Back");
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+
+        viewButton.setText("View");
+        viewButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(387, 387, 387))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
@@ -144,34 +178,40 @@ public class WelcomePage extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
-                            .addComponent(jTextField1))))
+                            .addComponent(jTextField1)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(viewButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(294, 294, 294)
+                                .addComponent(backButton)))))
                 .addGap(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(42, 42, 42)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(backButton))
+                .addGap(41, 41, 41)
                 .addComponent(resetButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
-                .addGap(18, 18, 18))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(viewButton)
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        JTable source = (JTable) evt.getSource();
-        int row = source.rowAtPoint(evt.getPoint());
-        int column = 0;
-        String moduleCode = source.getModel().getValueAt(row, column) + "";
-        setModuleCode(moduleCode);
-        new ModuleDetails().setVisible(true);
-        //JOptionPane.showMessageDialog(null, moduleCode);
+
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jTextField1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTextField1PropertyChange
@@ -217,6 +257,30 @@ public class WelcomePage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTextField1KeyReleased
 
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        new StudentPanel().setVisible(true);
+        dispose();
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void viewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewButtonActionPerformed
+        // TODO add your handling code here:
+        try {
+            int index = jTable1.getSelectedRow();
+            TableModel model = jTable1.getModel();
+            String moduleCode = model.getValueAt(index, 0).toString();
+            setModuleCode(moduleCode);
+            String credit = model.getValueAt(index, 1).toString();
+            setCredit(credit);
+            String activity = model.getValueAt(index, 2).toString();
+            setActivity(activity);
+            new ModuleDetails().setVisible(true);
+            dispose();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "NO COURSE SELECTED");
+        }
+
+    }//GEN-LAST:event_viewButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -234,29 +298,46 @@ public class WelcomePage extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(WelcomePage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StudentCourses.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(WelcomePage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StudentCourses.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(WelcomePage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StudentCourses.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(WelcomePage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(StudentCourses.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new WelcomePage().setVisible(true);
+                new StudentCourses().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton resetButton;
+    private javax.swing.JButton viewButton;
     // End of variables declaration//GEN-END:variables
 }
